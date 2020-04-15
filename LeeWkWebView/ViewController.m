@@ -7,9 +7,12 @@
 //
 
 #import "ViewController.h"
-
+#import "WKWebViewHelper.h"
+#import <WebKit/WebKit.h>
 @interface ViewController ()
-
+{
+    WKWebViewHelper *mWbHelper;
+}
 @end
 
 @implementation ViewController
@@ -17,6 +20,32 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    
+    /**
+     
+    通过构建移动JS 回调 Native App
+     
+     */
+    mWbHelper = [[WKWebViewHelper alloc] initHanlerNpc:@"iOSApp"];
+    
+    [mWbHelper addAsyncJSHandler:@"shareAction" pramasNames:@[@"title",@"content",@"url"]
+                          result:^(NSDictionary * _Nonnull values) {
+        
+    }];
+    NSData * values = [NSJSONSerialization dataWithJSONObject:@{@"token":@"12345"} options:NSJSONWritingFragmentsAllowed
+                                      error:nil];
+    NSString *token = [[NSString alloc] initWithData:values encoding:NSUTF8StringEncoding];
+    
+   
+    [mWbHelper addAsyncJSHandler:@"popBack" pramasNames:@[] result:^(NSDictionary * _Nonnull values) {
+        
+    }];
+  
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"index" ofType:@"html"];
+    WKWebView * webView =  [mWbHelper buildWithurl:[NSURL fileURLWithPath:path]];
+   
+      [self.view addSubview:webView];
 }
 
 
