@@ -59,7 +59,7 @@
     handler.name = handelrName;
     handler.action = result;
     if (![self.sycActions containsObject:handler]) {
-        [self.sycActions addObject:handler];
+        [self addAsyncAction:handler];
     }
     return self;
 }
@@ -90,8 +90,9 @@
     
     return wkWebView;
 }
+
 -(NSString *) createJavaScript{
-    NSMutableString * result = [NSMutableString stringWithFormat:@"%@ = {",mNpcName];
+    NSString * result = [NSString stringWithFormat:@"%@ = {",mNpcName];
     NSMutableArray * actions = [NSMutableArray arrayWithCapacity:0];
     for (WKActionHandler *handler in self.asyncActions) {
         NSString * aAction = [self serialAsync:handler];
@@ -115,6 +116,15 @@
     NSString * paramsStr = [handler.actionParamsName componentsJoinedByString:@","];
   NSString * func =  [NSMutableString stringWithFormat:@"\"%@\":function(%@){window.webkit.messageHandlers.%@.postMessage([%@]);}",handler.name,paramsStr,handler.name,paramsStr];
  return func;
+}
+-(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
+    for (WKActionHandler * handler in self.sycActions) {
+     NSString * jsAction =   [self serialSync:handler];
+        [webView evaluateJavaScript:jsAction
+                  completionHandler:^(id _Nullable value, NSError * _Nullable error) {
+            
+        }];
+    }
 }
 - (void)userContentController:(nonnull WKUserContentController *)userContentController didReceiveScriptMessage:(nonnull WKScriptMessage *)message {
     for (WKActionHandler * action in self.asyncActions) {
