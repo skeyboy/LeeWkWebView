@@ -12,6 +12,7 @@
 @interface ViewController ()
 {
     WKWebViewHelper *mWbHelper;
+    __weak IBOutlet UIButton *manualBtn;
 }
 @end
 
@@ -63,7 +64,21 @@
     NSString *path = [[NSBundle mainBundle] pathForResource:@"index" ofType:@"html"];
     WKWebView * webView =  [mWbHelper buildWithurl:[NSURL fileURLWithPath:path]];
    
-      [self.view addSubview:webView];
+    [self.view insertSubview:webView
+                belowSubview:manualBtn];
+//      [self.view addSubview:webView];
+}
+- (IBAction)manualCallJs:(id)sender {
+    
+    
+           WKActionHandler * tokenHandler = [[WKActionHandler alloc] init];
+           tokenHandler.name = @"getToken";
+           tokenHandler.actionParamsName = @[@"2345dcddd",[NSString stringWithFormat:@"%s",__func__]];
+           tokenHandler.action = ^(NSDictionary * _Nonnull vales) {
+               
+           };
+    [mWbHelper manualAppCallJS:tokenHandler];
+    
 }
 
 

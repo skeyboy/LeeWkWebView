@@ -26,7 +26,7 @@ pramasNames:(NSArray *) paramasName
      result:(void(^)(NSDictionary * values)) result;
 
 
-
+- (void)manualAppCallJS:(WKActionHandler *) handler;
 
 -(WKWebView * )buildWithurl:(NSURL *) url;
 

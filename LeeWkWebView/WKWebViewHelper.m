@@ -12,6 +12,7 @@
     NSString *mNpcName;
     CGRect mFrame;
     WKWebView * mWkWebView;
+    BOOL mWKFinishNavigation;
 }
 @property(strong, nonatomic) NSMutableArray * sycActions;
 @property(strong, nonatomic) NSMutableArray * asyncActions;
@@ -65,6 +66,16 @@
         [self addSyncAction:handler];
     }
     return self;
+}
+-(void)manualAppCallJS:(WKActionHandler *)handler{
+    if (mWKFinishNavigation) {
+        [self handelAppCallJs:handler];
+    }else{
+        while (!mWKFinishNavigation) {
+            //等待加载完成
+        }
+        [self manualAppCallJS:handler];
+    }
 }
 -(WKWebView * )buildWithurl:(NSURL *) url{
     WKWebViewConfiguration * config =  [[WKWebViewConfiguration alloc] init];
@@ -125,17 +136,21 @@
  return func;
 }
 -(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
+    mWKFinishNavigation = YES;
     if (self.didFinishNavigationHook != nil) {
         for (WKActionHandler * handler in self.didFinishNavigationHook()) {
-            NSString * jsAction =   [self serialSync:handler];
-            [webView evaluateJavaScript:jsAction
-                      completionHandler:^(id _Nullable value, NSError * _Nullable error) {
-                if (error == nil && value != nil) {
-                    handler.action(value);
-                }
-            }];
+            [self handelAppCallJs:handler];
         }
     }
+}
+-(void)handelAppCallJs:(WKActionHandler *) handler{
+    NSString * jsAction =   [self serialSync:handler];
+               [mWkWebView evaluateJavaScript:jsAction
+                         completionHandler:^(id _Nullable value, NSError * _Nullable error) {
+                   if (error == nil && value != nil) {
+                       handler.action(value);
+                   }
+               }];
 }
 - (void)userContentController:(nonnull WKUserContentController *)userContentController didReceiveScriptMessage:(nonnull WKScriptMessage *)message {
     for (WKActionHandler * action in self.asyncActions) {
