@@ -2,6 +2,9 @@
 之前lz公众号写个关于UIWebView的JS与App通信的文章，但是最新iOS审核规定需要替换掉UIWebView使用WKWebView才可以过审。但是之前有大量UIWebView交互的地方，怎么办？
 于是根据原有的交互经验抽离出来了LeeWKWebView……当然了希望大家能够喜欢，多多提意见
 # 使用
+
+> pod 'LeeWkWebView',:git=>'git@github.com:skeyboy/LeeWkWebView.git'
+
 之前不完善有了简单的介绍，今天就完善一下
 为了方便js调用识别我们为我们的句柄起了名字--npc
 >    mWbHelper = [[WKWebViewHelper alloc] initHanlerNpc:@"iOSApp" frame:[UIScreen mainScreen].bounds];
