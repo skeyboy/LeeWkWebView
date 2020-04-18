@@ -72,4 +72,3 @@
     WKWebView * webView =  [mWbHelper buildWithurl:[NSURL fileURLWithPath:path]];
 ```
 ![w](https://mmbiz.qpic.cn/mmbiz_gif/ic94zQJB2GfmkfkDqyleWPQz92vsWLnYXe5UKeKycbEPRCoEW50ye9LZoyibHtGVFjOn2tNic2X8U4GGbedic5TMFQ/640?wx_fmt=gif&wxfrom=5&wx_lazy=1)
-xie(https://mmbiz.qpic.cn/mmbiz_gif/ic94zQJB2GfmkfkDqyleWPQz92vsWLnYXe5UKeKycbEPRCoEW50ye9LZoyibHtGVFjOn2tNic2X8U4GGbedic5TMFQ/640?wx_fmt=gif&wxfrom=5&wx_lazy=1)
