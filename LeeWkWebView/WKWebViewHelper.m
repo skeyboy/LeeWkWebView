@@ -10,15 +10,18 @@
 @interface WKWebViewHelper()<WKScriptMessageHandler,WKUIDelegate,WKNavigationDelegate>
 {
     NSString *mNpcName;
+    CGRect mFrame;
+    WKWebView * mWkWebView;
 }
 @property(strong, nonatomic) NSMutableArray * sycActions;
 @property(strong, nonatomic) NSMutableArray * asyncActions;
 @end
 
 @implementation WKWebViewHelper
--(instancetype)initHanlerNpc:(NSString *)npcName{
+-(instancetype)initHanlerNpc:(NSString *)npcName frame:(CGRect)frame{
     if (self = [super init]) {
         mNpcName = [npcName copy];
+        mFrame = frame;
     }
     return self;
 }
@@ -59,7 +62,7 @@
     handler.name = handelrName;
     handler.action = result;
     if (![self.sycActions containsObject:handler]) {
-        [self addAsyncAction:handler];
+        [self addSyncAction:handler];
     }
     return self;
 }
@@ -80,15 +83,15 @@
         [config.userContentController addScriptMessageHandler:self
                                                          name:action.name];
     }
-    WKWebView * wkWebView = [[WKWebView alloc] initWithFrame:[UIScreen mainScreen].bounds
+    mWkWebView = [[WKWebView alloc] initWithFrame:mFrame
                                                configuration:config];
-    wkWebView.UIDelegate = self;
-    wkWebView.navigationDelegate = self;
+    mWkWebView.UIDelegate = self;
+    mWkWebView.navigationDelegate = self;
     
     
-    [wkWebView loadRequest:[NSURLRequest requestWithURL:url]];
+    [mWkWebView loadRequest:[NSURLRequest requestWithURL:url]];
     
-    return wkWebView;
+    return mWkWebView;
 }
 
 -(NSString *) createJavaScript{
@@ -105,9 +108,13 @@
     return result;
 }
 -(NSString *)serialSync:(WKActionHandler *) handler{
-    NSString * paramsStr = [handler.actionParamsName componentsJoinedByString:@","];
+    NSMutableArray * items = [NSMutableArray arrayWithCapacity:0];
+    for (NSString *p in handler.actionParamsName) {
+        [items addObject:[NSString stringWithFormat:@"`%@`",p]];
+    }
+    NSString * paramsStr = [items componentsJoinedByString:@","];
 
-    NSString *func = [NSMutableString stringWithFormat:@"\"%@\":function(){return JSON.stringify(%@);}",handler.name,handler.actionParamsName];
+    NSString *func = [NSMutableString stringWithFormat:@"%@(%@);",handler.name,paramsStr];
     return func;
 }
 
@@ -118,12 +125,16 @@
  return func;
 }
 -(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
-    for (WKActionHandler * handler in self.sycActions) {
-     NSString * jsAction =   [self serialSync:handler];
-        [webView evaluateJavaScript:jsAction
-                  completionHandler:^(id _Nullable value, NSError * _Nullable error) {
-            
-        }];
+    if (self.didFinishNavigationHook != nil) {
+        for (WKActionHandler * handler in self.didFinishNavigationHook()) {
+            NSString * jsAction =   [self serialSync:handler];
+            [webView evaluateJavaScript:jsAction
+                      completionHandler:^(id _Nullable value, NSError * _Nullable error) {
+                if (error == nil && value != nil) {
+                    handler.action(value);
+                }
+            }];
+        }
     }
 }
 - (void)userContentController:(nonnull WKUserContentController *)userContentController didReceiveScriptMessage:(nonnull WKScriptMessage *)message {
