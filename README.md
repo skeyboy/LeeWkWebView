@@ -9,6 +9,44 @@
 为了方便js调用识别我们为我们的句柄起了名字--npc
 >    mWbHelper = [[WKWebViewHelper alloc] initHanlerNpc:@"iOSApp" frame:[UIScreen mainScreen].bounds];
 
+## H5 JS 文件示例
+```
+ function btnClick() {
+        try {
+            iOSApp.shareAction({"title":"分享", "content":"内容", "url":"链接"})
+        } catch (err) {
+            alert(err)
+        }
+    }
+    
+    //App主动调用这个传递token
+    function getToken(token, other){
+        alert(token);
+        return other;
+    }
+    //JS 主动点击获取
+    function manualGetToken(){
+        alert(iOSApp.manualGetToken())
+    }
+    function shareLocation(){
+        alert(App.shareLocation())
+    }
+    function getAreaID(token){
+           alert(token);
+           return token;
+       }
+    function popBack() {
+           try {
+<!--               window.webkit.messageHandlers.popBack.postMessage([])-->
+iOSApp.popBack([])
+           } catch (err) {
+               alert(err)
+           }
+       }
+    </script>
+    
+```
+
 ## 1 增加Web加载完成时App主动给JS发信息的功能
 在做实际项目中web端提了个功能就是，当你App加载资源结束后，你给我web发送些信息---token，App位置信息（经纬度）……
 ```objective-c
