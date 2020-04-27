@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
   "#{spec.summary}"
                    DESC
 
-  spec.homepage     = "http://github.com/skeyboy/LeeWkWebView"
+  spec.homepage     = "https://github.com/skeyboy/LeeWkWebView"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
